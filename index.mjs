@@ -40,9 +40,9 @@ const part2Files = files
     .reduce(reduceExamples, []);
 
 run(part1Files, solve1);
-// run([{ input: inputFile }], solve1);
+run([{ input: inputFile }], solve1);
 run(part2Files, solve2);
-// run([{ input: inputFile }], solve2);
+run([{ input: inputFile }], solve2);
 
 function run (testCases, solve) {
     testCases.forEach(test => {
