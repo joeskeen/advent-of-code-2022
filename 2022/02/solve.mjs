@@ -32,12 +32,12 @@ export function solve1(lines) {
     moves.forEach(m => {
         // simulate the result
         let outcome; // WIN or LOSE or DRAW
-        if (m.opponenet === m.outcome) {
+        if (m.opponenet === m.you) {
             outcome = 'DRAW';
         } else if (
-            (m.opponenet === 'ROCK' && m.outcome === 'PAPER') ||
-            (m.opponenet === 'PAPER' && m.outcome === 'SCISSORS') ||
-            (m.opponenet === 'SCISSORS' && m.outcome === 'ROCK')
+            (m.opponenet === 'ROCK' && m.you === 'PAPER') ||
+            (m.opponenet === 'PAPER' && m.you === 'SCISSORS') ||
+            (m.opponenet === 'SCISSORS' && m.you === 'ROCK')
         ) {
             outcome = 'WIN';
         } else {
@@ -45,13 +45,13 @@ export function solve1(lines) {
         }
         
         // update the score
-        const roundScore = scores[m.outcome] + scores[outcome];
+        const roundScore = scores[m.you] + scores[outcome];
         score += roundScore;
-        console.log(outcome);
     });
 
     return score;
 }
+
 export function solve2(lines) {
     const options = {
         A: 'ROCK',
