@@ -75,7 +75,7 @@ function run (testCases, solve) {
 };
 
 function readFile(name) {
-    const contents = readFileSync(name).toString().trim();
-    const lines = contents.split(/\r?\n/g).map(line => line.trim());
+    const contents = readFileSync(name).toString().trimEnd();
+    const lines = contents.split(/\r?\n/g).map(line => line.trimEnd());
     return lines;
 }
