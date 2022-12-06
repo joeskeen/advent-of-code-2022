@@ -1,9 +1,14 @@
 import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join, resolve } from 'path';
+import { argv } from 'process';
+
+let args = argv.slice(2);
+// save real console.log so we can suppress/restore console logging at will
+const realConsoleLog = console.log;
 
 const puzzle = {
-    day: (process.argv[2] ?? new Date().getDate().toString()).padStart(2, '0'),
-    year: process.argv[3] ?? new Date().getFullYear().toString()
+    day: (args[0] ?? new Date().getDate().toString()).padStart(2, '0'),
+    year: args[1] ?? new Date().getFullYear().toString()
 };
 const puzzleDir = resolve(join('.', puzzle.year, puzzle.day));
 if (!existsSync(puzzleDir)) {
@@ -48,7 +53,14 @@ function run (testCases, solve) {
     testCases.forEach(test => {
         const lines = readFile(join(puzzleDir, test.input));
         let result;
+
+        // for the real puzzle input we don't want to console log EVERYTHING
+        if (lines.length > 100) {
+            console.log = () => {};
+        }
         result = solve(lines);
+        console.log = realConsoleLog;
+
         if (test.output) {
             const output = readFile(join(puzzleDir, test.output))[0];
             if (result == output) {
