@@ -55,7 +55,7 @@ function run (testCases, solve) {
         let result;
 
         // for the real puzzle input we don't want to console log EVERYTHING
-        if (lines.length > 100) {
+        if (lines.length > 100 || (lines.length === 1 && lines[0].length > 100)) {
             console.log = () => {};
         }
         result = solve(lines);
