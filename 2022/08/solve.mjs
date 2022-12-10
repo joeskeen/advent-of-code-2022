@@ -68,7 +68,7 @@ export function solve2(lines) {
   const biggest = grid
     .flat()
     .map((tree) => tree.scenicScore)
-    .reduce((biggest, current) => Math.max(biggest, current));
+    .reduce((biggest, current) => Math.max(biggest, current), 0);
   return biggest;
 }
 
