@@ -64,7 +64,7 @@ function run(testCases, solve) {
 
     // for the real puzzle input we don't want to console log EVERYTHING
     if (!isExample) {
-      // console.log = () => {};
+      console.log = () => {};
     }
     result = solve(lines);
     console.log = realConsoleLog;

@@ -60,7 +60,6 @@ export function solve2(lines) {
   const worryReducer = monkeys
     .map((m) => m.testDivisibleBy)
     .reduce((prev, curr) => prev * curr, 1);
-  console.log(worryReducer);
   const rounds = 10000;
   const specialRounds = [
     1, 20, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000,
