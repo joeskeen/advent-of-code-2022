@@ -124,6 +124,8 @@ function modifiedAStar(start, isGoal, h, d) {
     // how cheap a path could be from start to finish if it goes through n.
     const fScore = new Map(); // default value of Infinity
     fScore.set(start, h(start));
+
+    let bestPath;
   
     // while openSet is not empty
     while (openSet.length) {
@@ -133,7 +135,17 @@ function modifiedAStar(start, isGoal, h, d) {
         .map((n) => ({ node: n, fScore: (fScore.get(n) ?? Infinity) }))
         .sort((a, b) => a.fScore - b.fScore)[0].node;
   
-      if (isGoal(current)) return reconstructPath(cameFrom, current);
+      if (isGoal(current)) {
+        const path = reconstructPath(cameFrom, current);
+        if (bestPath) {
+            // is the new path better?
+            if (path.length < bestPath.length) {
+                bestPath = path;
+            }
+        } else {
+            bestPath = path;
+        }
+      } 
   
       openSet = openSet.filter((n) => n !== current);
   
@@ -153,8 +165,7 @@ function modifiedAStar(start, isGoal, h, d) {
       }
     }
   
-    // Open set is empty but goal was never reached
-    throw new Error('path finding failed: Open set is empty but goal was never reached')
+    return bestPath;
   }
 
 export function solve1(lines) {
