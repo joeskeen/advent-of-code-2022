@@ -1,0 +1,35 @@
+🏁 🍇 
+  💭 Read in arguments passed to this program
+  🎞️🐇💻❗ ➡️ args
+
+  ↪️ ❎📏args❓ 🙌 3❗ 🍇
+    😀🔤Unexpected number of args (requires day and year)🔤❗
+  🍉
+
+  🍺🔢🐽args 1❗ 10❗ ➡️ day
+  🍺🔢🐽args 2❗ 10❗ ➡️ year
+
+  😀🔤Day 🧲day🧲 🧲year🧲🔤❗
+🍉
+
+🕊️ 🧩 🍇
+  🖍️🆕year🔢
+  🖍️🆕day🔢
+  🖍️🆕examples🍨🐚🧑‍🏫🍆
+  🖍️🆕input🔡
+
+  🆕 🍼year🔢 🍼day🔢 🍼examples🍨🐚🧑‍🏫🍆 🍼input🔡 🍇🍉
+🍉
+
+🕊️ 🧑‍🏫 🍇
+  🖍️🆕input🔡
+  🖍️🆕output🔡
+  🆕 🍼input🔡 🍼output🔡 🍇🍉
+🍉
+
+➡️ 🍨🐚🔡🍆
+📂🐇📑 🔤~🔤 ❗ ➡️ dirContents
+🔂 item dirContents 🍇
+  😀 item ❗
+🍉
+🔡
