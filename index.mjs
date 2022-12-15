@@ -2,6 +2,9 @@ import { readFileSync, readdirSync, existsSync } from "fs";
 import { join, resolve } from "path";
 import { argv } from "process";
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
 let args = argv.slice(2);
 // save real console.log so we can suppress/restore console logging at will
 const realConsoleLog = console.log;
@@ -10,7 +13,7 @@ const puzzle = {
   day: (args[0] ?? new Date().getDate().toString()).padStart(2, "0"),
   year: args[1] ?? new Date().getFullYear().toString(),
 };
-const puzzleDir = resolve(join(".", puzzle.year, puzzle.day));
+const puzzleDir = resolve(join(__dirname, puzzle.year, puzzle.day));
 if (!existsSync(puzzleDir)) {
   throw new Error(
     `The directory for puzzle ${puzzle.year}/${puzzle.day} does not exist!`
