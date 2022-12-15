@@ -56,13 +56,13 @@ export function solve1(lines) {
       return;
     }
 
-    console.log(`searching within ${distance} of ${d.sensor}`);
+    // console.log(`searching within ${distance} of ${d.sensor}`);
 
     const dy = Math.abs(targetRow - d.sensor.y);
     const dx = distance - dy;
     impossibleRanges.push({ min: d.sensor.x - dx, max: d.sensor.x + dx });
   });
-  console.log("done populating", impossibleRanges, impossibleRanges.length);
+  // console.log("done populating", impossibleRanges, impossibleRanges.length);
 
   for (let i = impossibleRanges.length - 1; i >= 0; i--) {
     const range = impossibleRanges[i];
@@ -76,11 +76,11 @@ export function solve1(lines) {
     if (!overlapping) {
       continue;
     }
-    console.log(
-      `Range ${JSON.stringify(range)} overlaps ${JSON.stringify(
-        overlapping
-      )}, consolidating`
-    );
+    // console.log(
+    //   `Range ${JSON.stringify(range)} overlaps ${JSON.stringify(
+    //     overlapping
+    //   )}, consolidating`
+    // );
 
     // make sure entire range is represented by the overlapping one
     overlapping.min = Math.min(range.min, overlapping.min);
@@ -89,7 +89,7 @@ export function solve1(lines) {
     // remove `range` from list as it is now redundant
     impossibleRanges.splice(i, 1);
   }
-  console.log(impossibleRanges, impossibleRanges.length);
+  // console.log(impossibleRanges, impossibleRanges.length);
   const sum = impossibleRanges.reduce((prev, curr) => {
     return prev + (curr.max - curr.min);
   }, 0);
@@ -107,7 +107,7 @@ export function solve2(lines) {
 
   for (let targetRow = 0; targetRow < maxN; targetRow++) {
     if (targetRow % 100000 === 0) {
-      console.log(`targetRow = ${targetRow}`);
+      // console.log(`targetRow = ${targetRow}`);
     }
     const grid = {};
     const impossibleRanges = [];
@@ -153,8 +153,8 @@ export function solve2(lines) {
       impossibleRanges.sort((a,b) => a.min - b.min);
       const y = targetRow;
       const x = impossibleRanges[0].max + 1;
-      const tuningFrequency = x * maxN + y;
-      console.log({impossibleRanges, targetRow, x, y, tuningFrequency});
+      const tuningFrequency = x * 4000000 + y;
+      // console.log({impossibleRanges, targetRow, x, y, tuningFrequency});
       return tuningFrequency;
     }
   }
