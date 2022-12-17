@@ -53,6 +53,7 @@ function reconstructPath(cameFrom, current) {
 
 // A* finds a path from start to goal.
 // h is the heuristic function. h(n) estimates the cost to reach goal from node n.
+// d is the cost to get to the neighbor function
 function aStar(start, goal, h, d) {
   // The set of discovered nodes that may need to be (re-)expanded.
   // Initially, only the start node is known.
@@ -106,6 +107,7 @@ function aStar(start, goal, h, d) {
 
 // A* finds a path from start to goal.
 // h is the heuristic function. h(n) estimates the cost to reach goal from node n.
+// d is the cost to get to the neighbor function
 function modifiedAStar(start, isGoal, h, d) {
     // The set of discovered nodes that may need to be (re-)expanded.
     // Initially, only the start node is known.
