@@ -7,7 +7,9 @@ function parseInput(lines) {
       return {
         valve: match[1],
         flowRate: +match[2],
-        tunnels: match[3].split(", "),
+        tunnels: match[3]
+          .split(", ")
+          .map((valve) => ({ neighbor: valve, cost: 1 })),
       };
     })
     .reduce((prev, curr) => {
@@ -16,7 +18,36 @@ function parseInput(lines) {
     }, {});
   Object.keys(data).forEach((valveName) => {
     const valve = data[valveName];
-    valve.tunnels = valve.tunnels.map((v) => data[v]);
+    valve.tunnels = valve.tunnels.map((n) => ({
+      ...n,
+      neighbor: data[n.neighbor],
+    }));
+  });
+  Object.keys(data).forEach((valveName) => {
+    const node = data[valveName];
+    if (node.flowRate === 0 && node.tunnels.length === 2) {
+      // remove this node, connect its neighbors with added cost
+      const tunnelA = node.tunnels[0];
+      const tunnelB = node.tunnels[1];
+
+      tunnelA.neighbor.tunnels = tunnelA.neighbor.tunnels.filter(
+        (t) => t.neighbor !== node
+      );
+      tunnelA.neighbor.tunnels.push({
+        cost: tunnelA.cost + tunnelB.cost,
+        neighbor: tunnelB.neighbor,
+      });
+
+      tunnelB.neighbor.tunnels = tunnelB.neighbor.tunnels.filter(
+        (t) => t.neighbor !== node
+      );
+      tunnelB.neighbor.tunnels.push({
+        cost: tunnelB.cost + tunnelB.cost,
+        neighbor: tunnelA.neighbor,
+      });
+
+      delete data[valveName];
+    }
   });
   return data;
 }
@@ -25,7 +56,7 @@ function getBestFlow(startNode, timeRemaining, openedValves, previousNodes) {
   if (timeRemaining <= 0) {
     return {
       description: `out of time`,
-      flowAchieved: 0,
+      flowAchieved: [{ amount: 0 }],
       nowIn: startNode,
       timeRemaining: 0,
       openedValves: openedValves,
@@ -42,7 +73,32 @@ function getBestFlow(startNode, timeRemaining, openedValves, previousNodes) {
   if (startNode.flowRate > 0 && !openedValves.includes(startNode.valve)) {
     options.push(openAndMove());
   }
-  options.sort((a, b) => b.flowAchieved - a.flowAchieved);
+  options.sort(
+    (a, b) =>
+      b.flowAchieved.reduce((prev, curr) => prev + curr.amount, 0) -
+      a.flowAchieved.reduce((prev, curr) => prev + curr.amount, 0)
+  );
+
+  if (
+    options.find((o) =>
+      o.openedValves.join(",").startsWith("DD,BB,JJ,HH,EE,CC")
+    )
+  ) {
+    console.log(
+      JSON.stringify(
+        options
+          .filter((o) => o.flowAchieved.length > 1)
+          .map((o) => ({ ...o, nowIn: o.nowIn.valve })),
+        null,
+        2
+      )
+    );
+    console.log(
+      options.find((o) =>
+        o.openedValves.join(",").startsWith("DD,BB,JJ,HH,EE,CC")
+      )
+    );
+  }
 
   return options[0];
 
@@ -51,7 +107,7 @@ function getBestFlow(startNode, timeRemaining, openedValves, previousNodes) {
     const nextResult = move(result.timeRemaining, result.openedValves);
     return {
       description: `open ${startNode.valve} and move to ${nextResult.nowIn.valve}`,
-      flowAchieved: result.flowAchieved + nextResult.flowAchieved,
+      flowAchieved: [...result.flowAchieved, ...nextResult.flowAchieved],
       nowIn: nextResult.nowIn,
       timeRemaining: nextResult.timeRemaining,
       openedValves: nextResult.openedValves,
@@ -62,10 +118,15 @@ function getBestFlow(startNode, timeRemaining, openedValves, previousNodes) {
   function open() {
     let afterOpenTimeRemaining = timeRemaining - 1;
     const valvesOpenedNow = [...openedValves, startNode.valve];
-    const flowAmount = startNode.flowRate * afterOpenTimeRemaining;
+    const flow = {
+      valve: startNode.valve,
+      rate: startNode.flowRate,
+      timeOpen: afterOpenTimeRemaining,
+      amount: startNode.flowRate * afterOpenTimeRemaining,
+    };
     return {
       description: `open ${startNode.valve}`,
-      flowAchieved: flowAmount,
+      flowAchieved: [flow],
       nowIn: startNode,
       timeRemaining: afterOpenTimeRemaining,
       openedValves: valvesOpenedNow,
@@ -74,21 +135,26 @@ function getBestFlow(startNode, timeRemaining, openedValves, previousNodes) {
   }
 
   function move(timeRemaining, openedValves) {
-    let afterMoveTimeRemaining = timeRemaining - 1;
     const nextOptions = startNode.tunnels
       .filter((r) => {
-        const previousTrips = previousNodes.filter((n) => n === r.valve).length;
-        const neighborCount = r.tunnels.length;
+        const previousTrips = previousNodes.filter(
+          (n) => n === r.neighbor.valve
+        ).length;
+        const neighborCount = r.neighbor.tunnels.length;
         return previousTrips < neighborCount;
       })
       .map((t) =>
-        getBestFlow(t, afterMoveTimeRemaining, openedValves, [
+        getBestFlow(t.neighbor, timeRemaining - t.cost, openedValves, [
           ...previousNodes,
           startNode.valve,
         ])
       )
-      .sort((a, b) => b.flowAchieved - a.flowAchieved);
-    
+      .sort(
+        (a, b) =>
+          b.flowAchieved.reduce((prev, curr) => prev + curr.amount, 0) -
+          a.flowAchieved.reduce((prev, curr) => prev + curr.amount, 0)
+      );
+
     const bestOption = nextOptions[0];
     return bestOption
       ? {
@@ -101,7 +167,7 @@ function getBestFlow(startNode, timeRemaining, openedValves, previousNodes) {
   function wait(timeRemaining) {
     return {
       description: `wait in ${startNode.valve}`,
-      flowAchieved: 0,
+      flowAchieved: [{ amount: 0 }],
       nowIn: startNode,
       timeRemaining: timeRemaining - 1,
       openedValves: openedValves,
@@ -114,12 +180,14 @@ export function solve1(lines) {
   const graph = parseInput(lines);
   const openedValves = [];
 
-  // const bestOption = getBestFlow(graph.AA, 30, openedValves, []);
-  // console.log(bestOption);
-  // return bestOption.flowAchieved;
-  
-  const mermaidMarkup = generateMermaid(graph);
-  import('fs').then(fs=> fs.writeFileSync('graph.mermaid', mermaidMarkup));
+  const bestOption = getBestFlow(graph.AA, 30, openedValves, []);
+  console.log(bestOption);
+  return bestOption.flowAchieved.reduce((prev, curr) => prev + curr.amount, 0);
+
+  // console.log(graph);
+  // const mermaidMarkup = generateMermaid(graph);
+  // console.log(mermaidMarkup);
+  // import("fs").then((fs) => fs.writeFileSync("graph.mermaid", mermaidMarkup));
 }
 
 function generateMermaid(graph) {
@@ -131,8 +199,10 @@ function generateMermaid(graph) {
     .forEach((n) => {
       mermaidLines.push(`\t${n.valve}(${n.valve}: ${n.flowRate})`);
       n.tunnels
-        .filter((t) => t.valve.localeCompare(n.valve) > 0)
-        .forEach((t) => mermaidLines.push(`\t${n.valve} --- ${t.valve}`));
+        .filter((t) => t.neighbor.valve.localeCompare(n.valve) > 0)
+        .forEach((t) =>
+          mermaidLines.push(`\t${n.valve} ---|${t.cost}| ${t.neighbor.valve}`)
+        );
     });
   return mermaidLines.join("\n");
 }
